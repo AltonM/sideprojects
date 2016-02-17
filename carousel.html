@@ -1,0 +1,75 @@
+<html>
+	<head>
+		<title>jQuery SlideShow</title>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<style type="text/css">
+			<!--
+				.image-holder{
+					height:400px;
+					width:700px;
+					background-size:cover;
+					display:inline-block;
+					vertical-align:middle;
+					margin-right:10px;
+					border:solid 1px rgb(135,135,135);
+					cursor:pointer;
+					
+				}
+				.holder{
+					
+				}
+				
+				.featured{
+					width:700px;
+					background-color:rgb(245,245,245);
+					padding:10px;
+					margin:auto;
+					overflow:hidden;
+					border:solid 1px black;
+				}
+			-->
+		</style>
+		<script type="text/javascript">
+			var jQuery = $.noConflict();
+			var images = new Array();
+			
+			jQuery(document).ready(function(){
+				var element = jQuery('.featured');
+				var startImg = 2,perView=2,middle,num=0;
+				pleft = parseInt(jQuery('.featured').css('padding-left').split('p')[0]);
+				pright = parseInt(jQuery('.featured').css('padding-right').split('p')[0]);
+				var width = jQuery('.featured').width()+pleft+pright;
+				
+				jQuery('.holder').width(width*jQuery('.holder').children().length)
+				jQuery('.holder').mousedown(function(e){
+					var mleft = jQuery(this).css('margin-left').split('p')[0];
+					var originalPos = {'left':e.pageX,'top':e.pageY,'l':jQuery(this).css('margin-left').split('p')[0]};
+					jQuery('body').mousemove(function(e){
+						jQuery('.holder').css({'margin-left':Number(originalPos.l)+(e.pageX-originalPos.left)+'px'});
+					});
+					
+					jQuery('body').mouseup(function(){
+						//alert(Math.abs(jQuery('.holder').css('margin-left').split('p')[0]));
+						jQuery(this).unbind('mousemove');
+						jQuery(this).unbind('mouseup');
+					})
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div><span>Start X: </span><span id="startX"></span></div>
+		<div><span>Current X: </span><span id="currX"></span>
+		<div><span>Element Left: </span><span id="left"></span>
+		<div><span>Middle: </span><span id="middle"></span>
+		<div class="featured">
+			<div class="holder">
+				<div class="image-holder" style="background-image:url('one.jpg')"></div>
+				<div class="image-holder" style="background-image:url('two.jpg')"></div>
+				<div class="image-holder" style="background-image:url('three.jpg')"></div>
+				<div class="image-holder" style="background-image:url('four.jpg')"></div>
+			</div>
+		</div>
+	</body>
+</html>
