@@ -4,7 +4,7 @@
 		<script type="text/javascript" src="tween.js"></script>
 		<style type="text/css">
 			#d,#c{
-				border:solid 1px black;
+				border:solid 1px rgb(0,0,0);
 				padding:5px;
 				background-color:green;
 				margin-bottom:5px;
