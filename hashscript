@@ -1,0 +1,148 @@
+/***
+
+**/
+
+var hashManager = function(){
+	var hash,method,hashString,element;
+	hash = returnHashObj(window.location.hash).hash;
+	init = {
+		'start':false
+	}
+	pages = {
+		'home':'hp',
+		'portfolio':'pf',
+		'about':'ab',
+		'contact':'ct',
+		'examples':'ex'
+	}
+	
+	//run the hash if not home
+	
+	
+	window.addEventListener("hashchange", function(e){
+		runHash();
+	});
+	
+	
+	function runHash(){
+		currentHash = returnHashObj(window.location.hash);
+		if(init.start && currentHash.hash == hash && currentHash.extented!=''){
+			jQuery('.icontent #images').animate({'opacity':'0'},150,function(){
+				hash = currentHash.hash;
+				ext = (currentHash.extented!='')?'?'+currentHash.extented : '';
+				getPageContent('ajax.php','p='+ext+'&type=update_page_info&view='+view,jQuery('.icontent #images'));
+				jQuery('.icontent #images').animate({'opacity':'1'},250);
+			});
+			return false;
+		}else{
+			init.start = true;
+			jQuery('.body').animate({'opacity':'0'},150,function(){
+				hash = currentHash.hash;
+				ext = (currentHash.extented!='')?'/'+currentHash.extented : '';
+				jQuery('.body').html(getAjaxedContent(pages[currentHash.hash]+ext)).animate({'opacity':'1'},250,function(){
+					document.title = currentHash.hash[0].toUpperCase()+currentHash.hash.substr(1,currentHash.hash.length);
+				}).scrollTop(0);
+			});
+		}
+		place = location.hash.substring(location.hash.indexOf('#'),location.hash.indexOf('/')+1);
+		jQuery('.right > div').removeClass('active');
+		if(jQuery('a[href="'+place+'"]').length){
+			jQuery('a[href="'+place+'"]').parent().addClass('active');
+		}
+		//jQuery('.body').scrollTop();
+	}
+	
+	function checkHash(){
+		prevHash = returnHash(hash);
+		if(prevHash!==currentHash){
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
+	function returnHashObj(hash){
+		//return the hash or make the has return blank;
+		//hashExtend = hash.substring(hash.indexOf('/')+1,hash.length);
+		hashExtend = hash.substring(hash.indexOf('/')+1,hash.length).split('/');
+		hashExtend = implode(hashExtend,'/');
+		//alert(hashExtend);
+		return {'hash':hash.substring(hash.indexOf('#')+1,hash.indexOf('/')),'extented':hashExtend};
+	}
+	
+	function implode(array,seperator){
+		try{
+			if(array.constructor != Array) throw 'Argument 1 is not an array';
+		}
+		catch(err){
+			console.error(err);
+		}
+		
+		var newArray = '';
+		for(x = 0;x<array.length;x++){
+			if(x<1){
+				newArray+=array[x];
+			}else{
+				newArray+= seperator+''+array[x];
+			}
+		}
+		
+		return newArray;
+	}
+	
+	function getAjaxedContent(page){
+		var xmlhttp,type = type || 'GET',async = async || true,info;
+		if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+		  xmlhttp=new XMLHttpRequest();
+		}else{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		 xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				//alert(xmlhttp.responseText);
+               jQuery('.body').html( xmlhttp.responseText);
+            }
+        }
+        xmlhttp.open(type, page, async);
+        xmlhttp.send();
+		
+		return info;
+	}
+	
+	function getPageContent(page,data,home){
+		var xmlhttp,type = type || 'POST',async = async || false,info;
+		if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+		  xmlhttp=new XMLHttpRequest();
+		}else{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		 xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				//alert(xmlhttp.responseText);
+              info = JSON.parse(xmlhttp.responseText);
+			  //alert(info);
+			  if(hash == 'examples'){
+				jQuery('.icontent #images #body').html(info.p);
+				jQuery('.icontent #images').animate({'opacity':'1'},250);
+			  }else{
+				jQuery('.icontent #images').html(info.p);
+				jQuery('.icontent #images').animate({'opacity':'1'},250);
+			  }
+            }
+        }
+        xmlhttp.open(type, page, async);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		xmlhttp.send(data.replace('?',''));
+		
+		//return info;
+	}
+	
+	
+	if(hash!=''){
+		runHash();
+	}
+}
+window.onload = function(){
+	var hash = new hashManager();
+}
